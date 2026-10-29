@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Taller Mecánico</title>
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#f4f6f8; --card:#ffffff; --text:#12181f; --muted:#4f5a68; --line:#e3e8ee;
+  --accent:#0f766e; --accent2:#14b8a6; --danger:#e11d48; --warn:#f59e0b; --ok:#16a34a; --info:#2563eb;
+  --radius:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0e1318; --card:#171d24; --text:#e8edf3; --muted:#a4b0be; --line:#242c36; }
+  .badge.ok,.stock-pill.ok,.mov-icon.in{background:#0d3320;color:#4ade80}
+  .badge.warn,.stock-pill.warn{background:#3a2a0a;color:#fbbf24}
+  .badge.danger,.stock-pill.danger,.mov-icon.out{background:#3a0d17;color:#fb7185}
+  .badge.info{background:#172554;color:#93c5fd}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+html{font-size:19px}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;
+  padding-bottom:110px;font-size:17px;line-height:1.4;
+  -webkit-font-smoothing:antialiased;
+}
+header#topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;
+  padding:calc(14px + env(safe-area-inset-top)) 14px 14px;
+  background:var(--card);border-bottom:1px solid var(--line);
+}
+header#topbar h1{font-size:26px;margin:0;flex:1;font-weight:800;letter-spacing:-.4px}
+.icon-btn{
+  background:transparent;border:0;font-size:24px;padding:8px 12px;
+  border-radius:12px;color:var(--text);cursor:pointer;
+  min-width:48px;min-height:48px;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+main{padding:14px;max-width:720px;margin:0 auto}
+nav#tabs{
+  position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;
+  background:var(--card);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+nav#tabs button{
+  flex:1;background:none;border:0;padding:9px 2px 11px;display:flex;flex-direction:column;
+  align-items:center;gap:4px;font-size:13px;color:var(--muted);font-weight:800;
+  font-family:inherit;cursor:pointer;min-height:68px;
+}
+nav#tabs button .ico{font-size:28px;line-height:1}
+nav#tabs button.active{color:var(--accent)}
+.card{background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid var(--line);margin-bottom:14px}
+.card-title{font-size:15px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.stat{background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid var(--line)}
+.stat .lbl{font-size:13px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.stat .val{font-size:28px;font-weight:800;margin-top:8px;letter-spacing:-.5px}
+.stat.wide{grid-column:1/-1}
+.row{display:flex;align-items:center;gap:14px;padding:16px 16px;background:var(--card);
+  border:1px solid var(--line);border-radius:14px;margin-bottom:12px;cursor:pointer;min-height:70px}
+.row .main{flex:1;min-width:0}
+.row .t{font-weight:700;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .s{font-size:15px;color:var(--muted);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .right{text-align:right;font-size:17px;font-weight:800;flex-shrink:0}
+.row .icon-btn{font-size:22px;min-width:44px;min-height:44px;padding:6px 8px}
+.avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:21px;flex-shrink:0}
+.mini-row{display:flex;justify-content:space-between;gap:10px;padding:12px 0;
+  border-bottom:1px solid var(--line);font-size:17px}
+.mini-row:last-child{border-bottom:0}
+.mini-row span{color:var(--muted)}
+.empty{padding:22px 0;text-align:center;color:var(--muted);font-size:16px}
+.btn{border:0;border-radius:13px;padding:16px 20px;font-size:18px;font-weight:800;
+  font-family:inherit;cursor:pointer;transition:transform .05s;
+  min-height:58px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.info{background:var(--info);color:#fff}
+.btn.small{padding:12px 16px;font-size:16px;border-radius:12px;min-height:50px}
+.btn.full{width:100%}
+.chips{display:flex;gap:10px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--muted);
+  padding:12px 20px;border-radius:24px;font-size:17px;font-weight:800;
+  white-space:nowrap;font-family:inherit;cursor:pointer;min-height:52px}
+.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.badge{display:inline-block;font-size:12px;font-weight:800;padding:5px 10px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:.3px;vertical-align:middle}
+.badge.ok{background:#dcfce7;color:#15803d}
+.badge.warn{background:#fef3c7;color:#b45309}
+.badge.danger{background:#ffe4e6;color:#be123c}
+.badge.info{background:#dbeafe;color:#1d4ed8}
+.stock-pill{display:inline-block;font-size:12.5px;font-weight:800;padding:5px 10px;border-radius:20px;margin-left:8px;vertical-align:middle}
+.stock-pill.ok{background:#dcfce7;color:#15803d}
+.stock-pill.warn{background:#fef3c7;color:#b45309}
+.stock-pill.danger{background:#ffe4e6;color:#be123c}
+.segmented{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;margin-bottom:16px}
+.segmented button{flex:1;padding:13px 4px;border:0;background:transparent;color:var(--muted);
+  font-size:16px;font-weight:800;border-radius:10px;font-family:inherit;cursor:pointer;min-height:50px}
+.segmented button.active{background:var(--card);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.mov{display:flex;align-items:flex-start;gap:14px;padding:15px 16px;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px}
+.mov-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:20px;font-weight:800;flex-shrink:0}
+.mov-icon.in{background:#dcfce7;color:#15803d}
+.mov-icon.out{background:#ffe4e6;color:#be123c}
+.mov-main{flex:1;min-width:0}
+.mov-t{font-size:16.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mov-s{font-size:14px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mov-right{text-align:right;flex-shrink:0;font-size:18px;font-weight:800;line-height:1.2}
+.kardex-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.kardex-summary>div{background:var(--bg);padding:14px 6px;border-radius:12px;text-align:center}
+.kardex-summary .lbl{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+.kardex-summary .val{font-size:26px;font-weight:800;margin-top:6px}
+.chart{display:flex;align-items:flex-end;gap:6px;height:170px}
+.chart-col{flex:1;display:flex;flex-direction:column;height:100%}
+.bar-area{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}
+.bar-val{font-size:12px;color:var(--muted);font-weight:700}
+.chart-bar{width:72%;max-width:36px;border-radius:7px 7px 0 0;background:linear-gradient(180deg,var(--accent2),var(--accent));min-height:3px}
+.chart-lbl{font-size:13px;text-align:center;margin-top:7px;color:var(--muted);font-weight:700}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--card);width:100%;max-width:600px;border-radius:22px 22px 0 0;max-height:94vh;
+  display:flex;flex-direction:column;animation:up .18s ease}
+@keyframes up{from{transform:translateY(50px);opacity:.4}to{transform:none;opacity:1}}
+.sheet-head{display:flex;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}
+.sheet-head h2{font-size:22px;margin:0;flex:1;font-weight:800}
+.sheet-body{padding:18px;overflow-y:auto}
+.sheet-foot{display:flex;gap:10px;padding:14px 18px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.sheet-foot .btn{flex:1}
+.fld{display:block;margin-bottom:16px}
+.fld>span{display:block;font-size:14px;font-weight:800;color:var(--muted);margin-bottom:8px;letter-spacing:.2px}
+.fld input,.fld select,.fld textarea{
+  width:100%;padding:16px;border-radius:13px;border:1px solid var(--line);
+  background:var(--bg);color:var(--text);font-size:19px;font-family:inherit;min-height:58px;
+}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid var(--accent2);outline-offset:-1px}
+
+/* Tickets: fila con botón PDF + botón WhatsApp */
+.ticket-row{display:flex;gap:10px;margin-bottom:10px}
+.ticket-row .ticket-btn{
+  flex:1;justify-content:flex-start;padding:14px 18px;min-height:64px;
+  gap:12px;font-size:16.5px;text-align:left;overflow:hidden;
+}
+.ticket-row .ticket-btn > span:last-child{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ticket-row .pdf-ico{font-size:26px;line-height:1}
+.btn.whatsapp{
+  background:#25D366;color:#fff;min-width:64px;min-height:64px;
+  padding:0;font-size:28px;flex-shrink:0;border-radius:13px;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.btn.whatsapp:active{transform:scale(.95)}
+
+.estado-chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.estado-chips button{
+  padding:14px 6px;border:1px solid var(--line);background:var(--card);
+  color:var(--muted);font-size:15px;font-weight:800;border-radius:12px;
+  font-family:inherit;cursor:pointer;min-height:50px;
+}
+.estado-chips button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.diag-box{background:var(--bg);border-radius:13px;padding:14px;font-size:16px;line-height:1.5;white-space:pre-wrap;min-height:50px}
+.diag-box.empty{color:var(--muted);font-style:italic}
+
+/* ================= IMPRESIÓN - TICKET 80mm ================= */
+#printArea{display:none}
+@media print{
+  @page{ size:80mm auto; margin:0; }
+  body.printing > *:not(#printArea){display:none !important}
+  body.printing #printArea{display:block !important}
+  body.printing{padding:0 !important;background:#fff !important;color:#000 !important}
+
+  .ticket{
+    width:76mm;
+    padding:3mm 2mm;
+    margin:0;
+    font-family:Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-size:10.5pt;
+    line-height:1.35;
+    color:#000;
+    background:#fff;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  .ticket *{color:#000 !important}
+
+  .tk-center{text-align:center}
+  .tk-right{text-align:right}
+  .tk-bold{font-weight:800}
+  .tk-lg{font-size:14pt;line-height:1.15}
+  .tk-md{font-size:12pt;line-height:1.2}
+  .tk-sm{font-size:9pt;line-height:1.3}
+
+  .tk-sep{border-top:1px dashed #000;margin:2.5mm 0}
+  .tk-sep-strong{border-top:1.5px solid #000;margin:3mm 0}
+
+  .tk-header{margin-bottom:2mm}
+  .tk-header .tk-name{font-size:15pt;font-weight:800;line-height:1.1;margin-bottom:1mm}
+  .tk-header .tk-line{font-size:9pt;line-height:1.35}
+
+  .tk-doc-title{
+    text-align:center;font-size:12.5pt;font-weight:800;
+    margin:3mm 0 1.5mm;letter-spacing:.3px;
+  }
+  .tk-doc-num{text-align:center;font-size:11pt;font-weight:800;margin-bottom:0.5mm}
+  .tk-doc-fecha{text-align:center;font-size:9.5pt;margin-bottom:2mm}
+
+  .tk-label{
+    font-size:9.5pt;font-weight:800;text-transform:uppercase;
+    letter-spacing:.4px;margin-bottom:1.2mm;
+  }
+  .tk-section{margin-bottom:2mm}
+
+  .tk-row{
+    display:grid;grid-template-columns:auto 1fr;gap:3mm;
+    padding:0.6mm 0;font-size:10pt;
+  }
+  .tk-row > span:first-child{font-weight:700;color:#000}
+  .tk-row > span:last-child{text-align:right;word-break:break-word;overflow-wrap:anywhere}
+
+  .tk-box{
+    border:1px solid #000;padding:2mm;min-height:10mm;
+    white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;
+    font-size:10pt;line-height:1.4;
+  }
+
+  .tk-item{
+    padding:1.8mm 0;border-bottom:1px dotted #888;
+    font-size:10pt;line-height:1.3;
+  }
+  .tk-item:last-child{border-bottom:0}
+  .tk-item-title{font-weight:800;font-size:10.5pt}
+  .tk-item-detail{
+    display:flex;justify-content:space-between;gap:3mm;
+    margin-top:0.8mm;font-size:9.5pt;
+  }
+  .tk-item-detail span:last-child{font-weight:800;white-space:nowrap}
+
+  .tk-total-section{
+    margin-top:3mm;padding-top:2mm;border-top:2px solid #000;
+  }
+  .tk-total-line{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:1.2mm 0;font-size:10.5pt;
+  }
+  .tk-total-line span:last-child{font-weight:800;font-variant-numeric:tabular-nums}
+  .tk-total-line.big{
+    font-size:13pt;font-weight:800;
+    border-top:1px dashed #000;margin-top:1.5mm;padding-top:2mm;
+  }
+  .tk-total-line.big span{font-size:13pt}
+
+  .tk-aviso{
+    border:1px solid #000;padding:2.2mm;
+    font-size:8.8pt;line-height:1.35;margin-top:3mm;
+  }
+
+  .tk-sign{display:flex;gap:4mm;margin-top:14mm;page-break-inside:avoid}
+  .tk-sign > div{flex:1;text-align:center}
+  .tk-sign-line{border-top:1px solid #000;margin-bottom:1.5mm;height:14mm}
+  .tk-sign-label{font-size:8.5pt;line-height:1.25}
+
+  .tk-pie{
+    text-align:center;font-size:8pt;margin-top:4mm;
+    padding-top:2mm;border-top:1px dashed #000;line-height:1.3;
+  }
+
+  .tk-empty{color:#777;font-style:italic}
+}
+</style>
+</head>
+<body>
+
+<header id="topbar">
+  <button class="icon-btn" id="btnBack" data-act="back" style="display:none">←</button>
+  <h1 id="titulo">Panel</h1>
+  <button class="icon-btn" id="btnAjustes" title="Ajustes">⚙️</button>
+</header>
+
+<main id="view"></main>
+
+<nav id="tabs">
+  <button data-route="inicio"><span class="ico">📊</span>Panel</button>
+  <button data-route="clientes"><span class="ico">👤</span>Clientes</button>
+  <button data-route="vehiculos"><span class="ico">🚗</span>Vehículos</button>
+  <button data-route="ordenes"><span class="ico">🧾</span>Órdenes</button>
+  <button data-route="almacen"><span class="ico">📦</span>Almacén</button>
+</nav>
+
+<div id="modalRoot"></div>
+<div id="printArea"></div>
+
+<script>
+/* ============================================================
+   ESTADO Y PERSISTENCIA
+   ============================================================ */
+const DB_KEY = 'taller_db_v1';
+let db = {
+  clientes:[], vehiculos:[], servicios:[], repuestos:[], ordenes:[], movimientos:[],
+  ajustes:{ nombreTaller:'Mi Taller', direccion:'', telefono:'', nit:'' }
+};
+const state = { busquedaCliente:'', filtroOrden:'todas', filtroMov:'todas', subtabAlmacen:'servicios' };
+let route = { name:'inicio', param:null };
+const navStack = [];
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+
+function save(){ try{ localStorage.setItem(DB_KEY, JSON.stringify(db)); }catch(e){ alert('No se pudo guardar: '+e.message); } }
+
+function cargar(){
+  const raw = localStorage.getItem(DB_KEY);
+  if(raw){
+    try{ db = Object.assign({clientes:[], vehiculos:[], servicios:[], repuestos:[], ordenes:[], movimientos:[], ajustes:{}}, JSON.parse(raw)); }
+    catch(e){ console.warn(e); }
+  } else {
+    db.servicios = [
+      { id:uid(), nombre:'Cambio de aceite y filtro', precio:80000 },
+      { id:uid(), nombre:'Alineación y balanceo',     precio:60000 },
+      { id:uid(), nombre:'Revisión de frenos',        precio:50000 }
+    ];
+    db.repuestos = [
+      { id:uid(), nombre:'Filtro de aceite', stock:10, precioCompra:15000, precioVenta:28000 }
+    ];
+    save();
+  }
+  if(!db.movimientos) db.movimientos = [];
+  if(!db.ajustes) db.ajustes = {};
+  db.ajustes = Object.assign({ nombreTaller:'Mi Taller', direccion:'', telefono:'', nit:'' }, db.ajustes);
+
+  if(!db._migrado_v2){
+    db.repuestos.forEach(r=>{
+      const tiene = db.movimientos.some(m=>m.repuestoId===r.id);
+      if(!tiene && r.stock > 0){
+        db.movimientos.push({
+          id: uid(), repuestoId:r.id, tipo:'entrada', cantidad:r.stock,
+          motivo:'inicial', refId:null, refDesc:'Stock inicial (migración)',
+          fecha: new Date().toISOString().slice(0,10),
+          stockAntes:0, stockDespues: r.stock
+        });
+      }
+    });
+    db._migrado_v2 = true;
+  }
+  let siguiente = (Math.max(0, ...db.ordenes.map(o=>Number(o.numero)||0))) + 1;
+  db.ordenes.forEach(o=>{
+    if(!o.numero){ o.numero = siguiente++; }
+    if(!o.diagnostico) o.diagnostico = '';
+    if(!o.pendientes) o.pendientes = [];
+    if(!o.estado) o.estado = 'abierta';
+  });
+  save();
+}
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function money(n){ return '$' + Math.round(Number(n)||0).toLocaleString('es-CO'); }
+function shortMoney(n){
+  n = Number(n)||0;
+  if(n >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M';
+  if(n >= 1000) return Math.round(n/1000) + 'k';
+  return String(Math.round(n));
+}
+function fechaCorta(f){
+  if(!f) return '';
+  const p = String(f).split('-');
+  if(p.length < 3) return f;
+  return `${p[2]}/${p[1]}/${p[0].slice(2)}`;
+}
+function fechaLarga(f){
+  if(!f) return '';
+  const p = String(f).split('-');
+  if(p.length < 3) return f;
+  return `${p[2]}/${p[1]}/${p[0]}`;
+}
+function mesDe(fecha){
+  if(typeof fecha === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(fecha)){
+    const [y,m] = fecha.split('-').map(Number);
+    return { y, m: m-1 };
+  }
+  const d = fecha ? new Date(fecha) : new Date();
+  if(isNaN(d)) { const h = new Date(); return { y:h.getFullYear(), m:h.getMonth() }; }
+  return { y:d.getFullYear(), m:d.getMonth() };
+}
+function hoyISO(){ return new Date().toISOString().slice(0,10); }
+function numOrden(n){ return '#' + String(n||0).padStart(4,'0'); }
+function horaActual(){
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function totalOrden(o){ return (o.items||[]).reduce((s,i)=> s + i.cantidad*i.precio, 0); }
+function pagadoOrden(o){ return (o.pagos||[]).reduce((s,p)=> s + Number(p.monto||0), 0); }
+function saldoOrden(o){ return totalOrden(o) - pagadoOrden(o); }
+function totalPendientes(o){ return (o.pendientes||[]).reduce((s,p)=> s + p.cantidad*p.precio, 0); }
+function saldoCliente(clienteId){
+  const vids = db.vehiculos.filter(v=>v.clienteId===clienteId).map(v=>v.id);
+  return db.ordenes.filter(o=>vids.includes(o.vehiculoId)).reduce((s,o)=> s + Math.max(0, saldoOrden(o)), 0);
+}
+
+const MOTIVOS_ENTRADA = [
+  {value:'compra',    label:'Compra / reabastecimiento'},
+  {value:'devolucion',label:'Devolución (cliente u orden)'},
+  {value:'ajuste',    label:'Ajuste de inventario'},
+  {value:'inicial',   label:'Stock inicial'},
+  {value:'otro',      label:'Otro'}
+];
+const MOTIVOS_SALIDA = [
+  {value:'venta',    label:'Venta directa'},
+  {value:'servicio', label:'Uso en servicio / orden'},
+  {value:'ajuste',   label:'Ajuste de inventario'},
+  {value:'merma',    label:'Merma / daño'},
+  {value:'garantia', label:'Garantía'},
+  {value:'otro',     label:'Otro'}
+];
+const MOTIVO_LABELS = {
+  inicial:'Stock inicial', compra:'Compra', devolucion:'Devolución',
+  ajuste:'Ajuste', servicio:'Servicio', venta:'Venta',
+  merma:'Merma', garantia:'Garantía', otro:'Otro'
+};
+function motivoLabel(m){ return MOTIVO_LABELS[m] || m || '—'; }
+
+function registrarMovimiento(repuestoId, tipo, cantidad, motivo, refId, refDesc, fecha){
+  const r = db.repuestos.find(x=>x.id===repuestoId);
+  if(!r) return null;
+  const stockAntes = r.stock;
+  const delta = tipo === 'entrada' ? cantidad : -cantidad;
+  r.stock = Math.max(0, r.stock + delta);
+  const mov = {
+    id: uid(), repuestoId, tipo, cantidad, motivo,
+    refId: refId || null, refDesc: refDesc || '',
+    fecha: fecha || hoyISO(),
+    stockAntes, stockDespues: r.stock
+  };
+  db.movimientos.push(mov);
+  return mov;
+}
+function ordenRef(o){
+  const v = db.vehiculos.find(x=>x.id===o.vehiculoId);
+  const placa = v ? (v.placa || '') : '';
+  return `Orden ${numOrden(o.numero)}${placa ? ' · '+placa : ''}`;
+}
+function stockClass(n){ return n === 0 ? 'danger' : n <= 3 ? 'warn' : 'ok'; }
+function movRow(m){
+  const r = db.repuestos.find(x=>x.id===m.repuestoId);
+  const nombre = r ? r.nombre : '(repuesto eliminado)';
+  const isIn = m.tipo === 'entrada';
+  return `<div class="mov">
+    <div class="mov-icon ${isIn?'in':'out'}">${isIn?'+':'−'}</div>
+    <div class="mov-main">
+      <div class="mov-t">${esc(nombre)}</div>
+      <div class="mov-s">${fechaCorta(m.fecha)} · ${esc(motivoLabel(m.motivo))}${m.refDesc?' · '+esc(m.refDesc):''}</div>
+    </div>
+    <div class="mov-right" style="color:${isIn?'var(--ok)':'var(--danger)'}">
+      ${isIn?'+':''}${m.cantidad}
+      <div style="font-size:11px;color:var(--muted);font-weight:600">stock ${m.stockDespues}</div>
+    </div>
+  </div>`;
+}
+function badgeEstado(e){
+  if(e==='cerrada') return '<span class="badge ok">Cerrada</span>';
+  if(e==='proceso') return '<span class="badge info">En proceso</span>';
+  return '<span class="badge warn">Abierta</span>';
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+function openModal(title, bodyHtml, onSave, saveLabel){
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="overlay">
+      <div class="sheet">
+        <div class="sheet-head">
+          <h2>${esc(title)}</h2>
+          <button class="icon-btn" data-close type="button">✕</button>
+        </div>
+        <form class="sheet-body" id="modalForm">${bodyHtml}</form>
+        <div class="sheet-foot">
+          <button class="btn ghost" data-close type="button">Cancelar</button>
+          <button class="btn primary" id="modalSave" type="button">${esc(saveLabel||'Guardar')}</button>
+        </div>
+      </div>
+    </div>`;
+  root.querySelectorAll('[data-close]').forEach(b => b.onclick = closeModal);
+  root.querySelector('.overlay').onclick = e => { if(e.target.classList.contains('overlay')) closeModal(); };
+  document.getElementById('modalSave').onclick = () => {
+    const data = Object.fromEntries(new FormData(document.getElementById('modalForm')).entries());
+    if(onSave(data) !== false) closeModal();
+  };
+  document.getElementById('modalForm').onsubmit = e => { e.preventDefault(); document.getElementById('modalSave').click(); };
+  return root;
+}
+function closeModal(){ document.getElementById('modalRoot').innerHTML = ''; }
+
+function field(label, name, value, type, attrs){
+  return `<label class="fld"><span>${esc(label)}</span>
+    <input type="${type||'text'}" name="${name}" value="${esc(value)}" ${attrs||''}></label>`;
+}
+function textareaField(label, name, value, rows){
+  return `<label class="fld"><span>${esc(label)}</span>
+    <textarea name="${name}" rows="${rows||3}">${esc(value)}</textarea></label>`;
+}
+function selectField(label, name, options, value){
+  return `<label class="fld"><span>${esc(label)}</span><select name="${name}">
+    ${options.map(o=>`<option value="${esc(o.value)}" ${o.value===value?'selected':''}>${esc(o.label)}</option>`).join('')}
+  </select></label>`;
+}
+
+/* ============================================================
+   NAVEGACIÓN
+   ============================================================ */
+function render(){
+  document.getElementById('btnBack').style.display = navStack.length ? 'block' : 'none';
+  document.querySelectorAll('#tabs button').forEach(b=>{
+    const r = b.dataset.route;
+    const activo = r===route.name
+      || (route.name==='cliente' && r==='clientes')
+      || (route.name==='orden'   && r==='ordenes');
+    b.classList.toggle('active', activo);
+  });
+
+  const t = document.getElementById('titulo');
+  const v = document.getElementById('view');
+  switch(route.name){
+    case 'inicio':    t.textContent='Panel';      v.innerHTML = viewInicio();          break;
+    case 'clientes':  t.textContent='Clientes';   v.innerHTML = viewClientes();        break;
+    case 'cliente':   { const c=db.clientes.find(x=>x.id===route.param); t.textContent = c?c.nombre:'Cliente'; v.innerHTML = viewCliente(route.param); break; }
+    case 'vehiculos': t.textContent='Vehículos';  v.innerHTML = viewVehiculos();       break;
+    case 'ordenes':   t.textContent='Órdenes';    v.innerHTML = viewOrdenes();         break;
+    case 'orden':     t.textContent='Orden';      v.innerHTML = viewOrden(route.param); break;
+    case 'almacen':   t.textContent='Almacén';    v.innerHTML = viewAlmacen();         break;
+  }
+}
+function go(name, param){
+  navStack.push({ name:route.name, param:route.param });
+  route = { name, param };
+  render(); window.scrollTo(0,0);
+}
+function back(){
+  route = navStack.pop() || { name:'inicio', param:null };
+  render(); window.scrollTo(0,0);
+}
+function navTab(name){
+  navStack.length = 0;
+  route = { name, param:null };
+  render(); window.scrollTo(0,0);
+}
+
+/* ============================================================
+   VISTA: PANEL
+   ============================================================ */
+function filaOrden(o){
+  const v = db.vehiculos.find(x=>x.id===o.vehiculoId);
+  const c = v && db.clientes.find(x=>x.id===v.clienteId);
+  const total = totalOrden(o), saldo = saldoOrden(o);
+  return `<div class="row" data-act="orden-ver" data-id="${o.id}">
+    <div class="main">
+      <div class="t">${esc(v ? (v.placa || (v.marca+' '+(v.modelo||'')).trim()) : 'Vehículo eliminado')} ${badgeEstado(o.estado)}</div>
+      <div class="s">${numOrden(o.numero)} · ${esc(c ? c.nombre : '')} · ${fechaCorta(o.fecha)} · Total ${money(total)}</div>
+    </div>
+    <div class="right" style="color:${saldo>0.5 ? 'var(--danger)' : 'var(--ok)'}">
+      ${saldo>0.5 ? money(saldo) : 'Pagado'}
+    </div>
+  </div>`;
+}
+
+function viewInicio(){
+  const hoy = new Date();
+  const ay = hoy.getFullYear(), am = hoy.getMonth();
+  let ingresosMes = 0, saldoTotal = 0, abiertas = 0;
+
+  db.ordenes.forEach(o=>{
+    (o.pagos||[]).forEach(p=>{
+      const d = mesDe(p.fecha);
+      if(d.y===ay && d.m===am) ingresosMes += Number(p.monto||0);
+    });
+    const s = saldoOrden(o);
+    if(s > 0.5) saldoTotal += s;
+    if(o.estado !== 'cerrada') abiertas++;
+  });
+
+  const meses = [];
+  for(let i=5; i>=0; i--){
+    const d = new Date(ay, am-i, 1);
+    meses.push({ y:d.getFullYear(), m:d.getMonth(),
+      label:d.toLocaleDateString('es-CO',{month:'short'}).replace('.',''), total:0 });
+  }
+  db.ordenes.forEach(o=>(o.pagos||[]).forEach(p=>{
+    const d = mesDe(p.fecha);
+    const mm = meses.find(x=>x.y===d.y && x.m===d.m);
+    if(mm) mm.total += Number(p.monto||0);
+  }));
+  const max = Math.max(1, ...meses.map(m=>m.total));
+
+  const mapa = {};
+  db.ordenes.forEach(o=>(o.items||[]).forEach(it=>{
+    mapa[it.nombre] = (mapa[it.nombre]||0) + it.cantidad*it.precio;
+  }));
+  const top = Object.entries(mapa).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+  const recientes = [...db.ordenes].sort((a,b)=> String(b.fecha||'').localeCompare(String(a.fecha||''))).slice(0,5);
+  const bajos = db.repuestos.filter(r=>r.stock <= 3).sort((a,b)=>a.stock-b.stock).slice(0,5);
+  const movsRecientes = db.movimientos
+    .filter(m => db.repuestos.some(r=>r.id===m.repuestoId))
+    .sort((a,b)=> String(b.fecha).localeCompare(String(a.fecha)) || String(b.id).localeCompare(String(a.id)))
+    .slice(0,5);
+
+  return `
+    <div class="stats">
+      <div class="stat wide">
+        <div class="lbl">Ingresos de ${hoy.toLocaleDateString('es-CO',{month:'long', year:'numeric'})}</div>
+        <div class="val" style="color:var(--accent)">${money(ingresosMes)}</div>
+      </div>
+      <div class="stat">
+        <div class="lbl">Por cobrar</div>
+        <div class="val" style="color:var(--danger)">${money(saldoTotal)}</div>
+      </div>
+      <div class="stat">
+        <div class="lbl">Órdenes activas</div>
+        <div class="val">${abiertas}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Ingresos últimos 6 meses</div>
+      <div class="chart">
+        ${meses.map(m=>`
+          <div class="chart-col">
+            <div class="bar-area">
+              <div class="bar-val">${m.total ? shortMoney(m.total) : ''}</div>
+              <div class="chart-bar" style="height:${Math.max(2,(m.total/max)*100)}%" title="${money(m.total)}"></div>
+            </div>
+            <div class="chart-lbl">${m.label}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚠️ Bajo stock (${bajos.length})</div>
+      ${bajos.length ? bajos.map(r=>`
+        <div class="mini-row" data-act="repuesto-kardex" data-id="${r.id}" style="cursor:pointer">
+          <span>${esc(r.nombre)}</span>
+          <b style="color:${r.stock===0?'var(--danger)':'var(--warn)'}">${r.stock} und</b>
+        </div>`).join('') : '<div class="empty">Inventario en orden</div>'}
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="card-title" style="margin:0">Movimientos recientes</div>
+        <button class="btn ghost small" data-act="ver-movs" style="padding:8px 14px;font-size:14px">Ver todos</button>
+      </div>
+      ${movsRecientes.length ? movsRecientes.map(movRow).join('') : '<div class="empty">Sin movimientos</div>'}
+    </div>
+
+    <div class="card">
+      <div class="card-title">Ítems más facturados</div>
+      ${top.length
+        ? top.map(([n,v])=>`<div class="mini-row"><span>${esc(n)}</span><b>${money(v)}</b></div>`).join('')
+        : '<div class="empty">Sin datos todavía</div>'}
+    </div>
+
+    <div class="card">
+      <div class="card-title">Órdenes recientes</div>
+      ${recientes.length ? recientes.map(filaOrden).join('') : '<div class="empty">Aún no hay órdenes</div>'}
+    </div>
+  `;
+}
+
+/* ============================================================
+   VISTA: CLIENTES
+   ============================================================ */
+function filtrarClientes(){
+  const q = state.busquedaCliente.trim().toLowerCase();
+  return db.clientes.filter(c => !q || (c.nombre||'').toLowerCase().includes(q) || (c.telefono||'').includes(q));
+}
+function listaClientesHtml(lista){
+  if(!lista.length) return '<div class="empty">No hay clientes</div>';
+  return lista.map(c=>{
+    const nv = db.vehiculos.filter(v=>v.clienteId===c.id).length;
+    const saldo = saldoCliente(c.id);
+    return `<div class="row" data-act="cliente-ver" data-id="${c.id}">
+      <div class="avatar">${esc((c.nombre||'?').charAt(0).toUpperCase())}</div>
+      <div class="main">
+        <div class="t">${esc(c.nombre)}</div>
+        <div class="s">${esc(c.telefono||'Sin teléfono')} · ${nv} vehículo(s)</div>
+      </div>
+      <div class="right">${saldo>0.5 ? `<span style="color:var(--danger)">${money(saldo)}</span>` : ''}</div>
+    </div>`;
+  }).join('');
+}
+function viewClientes(){
+  return `
+    <button class="btn primary full" data-act="cliente-nuevo">+ Nuevo cliente</button>
+    <div style="height:14px"></div>
+    <label class="fld"><input id="buscarCliente" type="search" placeholder="Buscar por nombre o teléfono..."
+      value="${esc(state.busquedaCliente)}"></label>
+    <div id="listaClientes">${listaClientesHtml(filtrarClientes())}</div>
+  `;
+}
+
+function viewCliente(id){
+  const c = db.clientes.find(x=>x.id===id);
+  if(!c) return '<div class="empty">Cliente no encontrado</div>';
+  const vs = db.vehiculos.filter(v=>v.clienteId===id);
+  const vids = vs.map(v=>v.id);
+  const os = db.ordenes.filter(o=>vids.includes(o.vehiculoId))
+    .sort((a,b)=> String(b.fecha||'').localeCompare(String(a.fecha||'')));
+
+  return `
+    <div class="card">
+      <div class="card-title">Datos del cliente</div>
+      <div class="mini-row"><span>Nombre</span><b>${esc(c.nombre)}</b></div>
+      <div class="mini-row"><span>Teléfono</span><b>${esc(c.telefono||'—')}</b></div>
+      <div class="mini-row"><span>Dirección</span><b>${esc(c.direccion||'—')}</b></div>
+      <div class="mini-row"><span>Saldo pendiente</span>
+        <b style="color:${saldoCliente(id)>0.5?'var(--danger)':'var(--ok)'}">${money(saldoCliente(id))}</b></div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button class="btn ghost small" style="flex:1" data-act="cliente-editar" data-id="${id}">✏️ Editar</button>
+        <button class="btn danger small" style="flex:1" data-act="cliente-borrar" data-id="${id}">🗑 Eliminar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Vehículos</div>
+      ${vs.length ? vs.map(v=>`
+        <div class="row" data-act="vehiculo-editar" data-id="${v.id}">
+          <div class="main">
+            <div class="t">${esc(v.placa || 'Sin placa')}</div>
+            <div class="s">${esc([v.marca,v.modelo,v.anio].filter(Boolean).join(' '))}${v.km?' · '+esc(v.km)+' km':''}</div>
+          </div>
+          <div class="right">✏️</div>
+        </div>`).join('') : '<div class="empty">Sin vehículos registrados</div>'}
+      <button class="btn ghost small full" style="margin-top:8px" data-act="vehiculo-nuevo" data-id="${id}">+ Agregar vehículo</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Historial de órdenes</div>
+      ${os.length ? os.map(filaOrden).join('') : '<div class="empty">Sin órdenes registradas</div>'}
+    </div>
+  `;
+}
+
+/* ============================================================
+   VISTA: VEHÍCULOS
+   ============================================================ */
+function viewVehiculos(){
+  return `
+    <button class="btn primary full" data-act="vehiculo-nuevo">+ Nuevo vehículo</button>
+    <div style="height:14px"></div>
+    ${db.vehiculos.length ? db.vehiculos.map(v=>{
+      const c = db.clientes.find(x=>x.id===v.clienteId);
+      return `<div class="row" data-act="vehiculo-ver" data-id="${v.id}">
+        <div class="main">
+          <div class="t">${esc(v.placa||'Sin placa')} · ${esc(v.marca||'')} ${esc(v.modelo||'')}</div>
+          <div class="s">${esc(c?c.nombre:'Sin dueño')}${v.anio?' · '+esc(v.anio):''}${v.km?' · '+esc(v.km)+' km':''}</div>
+        </div>
+        <div class="right" style="color:var(--muted)">›</div>
+      </div>`;
+    }).join('') : '<div class="empty">Aún no hay vehículos</div>'}
+  `;
+}
+
+/* ============================================================
+   VISTA: ÓRDENES
+   ============================================================ */
+function viewOrdenes(){
+  const f = state.filtroOrden;
+  let lista = [...db.ordenes].sort((a,b)=> String(b.fecha||'').localeCompare(String(a.fecha||'')));
+  if(f==='abiertas')  lista = lista.filter(o=>o.estado==='abierta');
+  if(f==='proceso')   lista = lista.filter(o=>o.estado==='proceso');
+  if(f==='cerradas')  lista = lista.filter(o=>o.estado==='cerrada');
+
+  return `
+    <button class="btn primary full" data-act="orden-nuevo">+ Nueva orden de trabajo</button>
+    <div style="height:14px"></div>
+    <div class="chips">
+      ${[['todas','Todas'],['abiertas','Abiertas'],['proceso','En proceso'],['cerradas','Cerradas']].map(([v,l])=>
+        `<button class="chip ${f===v?'active':''}" data-act="filtro" data-id="${v}">${l}</button>`
+      ).join('')}
+    </div>
+    ${lista.length ? lista.map(filaOrden).join('') : '<div class="empty">Sin órdenes</div>'}
+  `;
+}
+
+function viewOrden(id){
+  const o = db.ordenes.find(x=>x.id===id);
+  if(!o) return '<div class="empty">Orden no encontrada</div>';
+  const v = db.vehiculos.find(x=>x.id===o.vehiculoId);
+  const c = v && db.clientes.find(x=>x.id===v.clienteId);
+  const total = totalOrden(o), pagado = pagadoOrden(o), saldo = total - pagado;
+  const totalPend = totalPendientes(o);
+
+  return `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:20px;font-weight:800">${numOrden(o.numero)} · ${esc(v ? (v.placa||'Sin placa') : '—')}</div>
+          <div style="font-size:15px;color:var(--muted);margin-top:4px">
+            ${esc(v ? [v.marca,v.modelo,v.anio].filter(Boolean).join(' ') : '')} · ${esc(c?c.nombre:'Sin cliente')}
+          </div>
+          <div style="font-size:15px;color:var(--muted)">${fechaLarga(o.fecha)}</div>
+        </div>
+        ${badgeEstado(o.estado)}
+      </div>
+    </div>
+
+    <div class="card-title" style="margin:0 0 10px 4px">Estado de la orden</div>
+    <div class="estado-chips">
+      <button data-act="estado" data-id="${o.id}" data-estado="abierta" class="${o.estado==='abierta'?'active':''}">🔵 Abierta</button>
+      <button data-act="estado" data-id="${o.id}" data-estado="proceso" class="${o.estado==='proceso'?'active':''}">🟠 Proceso</button>
+      <button data-act="estado" data-id="${o.id}" data-estado="cerrada" class="${o.estado==='cerrada'?'active':''}">🟢 Cerrada</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎫 Tickets para el cliente (80mm)</div>
+
+      <div class="ticket-row">
+        <button class="btn ghost ticket-btn" data-act="pdf" data-id="${o.id}" data-tipo="ingreso">
+          <span class="pdf-ico">📄</span>
+          <span>Comprobante de ingreso</span>
+        </button>
+        <button class="btn whatsapp" data-act="whatsapp" data-id="${o.id}" data-tipo="ingreso" title="Enviar por WhatsApp">💬</button>
+      </div>
+
+      <div class="ticket-row">
+        <button class="btn info ticket-btn" data-act="pdf" data-id="${o.id}" data-tipo="diagnostico">
+          <span class="pdf-ico">📋</span>
+          <span>Informe de diagnóstico</span>
+        </button>
+        <button class="btn whatsapp" data-act="whatsapp" data-id="${o.id}" data-tipo="diagnostico" title="Enviar por WhatsApp">💬</button>
+      </div>
+
+      <div class="ticket-row">
+        <button class="btn ghost ticket-btn" data-act="pdf" data-id="${o.id}" data-tipo="entrega">
+          <span class="pdf-ico">🧾</span>
+          <span>Comprobante de entrega</span>
+        </button>
+        <button class="btn whatsapp" data-act="whatsapp" data-id="${o.id}" data-tipo="entrega" title="Enviar por WhatsApp">💬</button>
+      </div>
+
+      <p style="font-size:14px;color:var(--muted);margin:14px 0 0;line-height:1.55">
+        <b>📄 PDF:</b> guarda el ticket como PDF para adjuntar.<br>
+        <b>💬 WhatsApp:</b> abre el chat con el cliente con el resumen ya escrito.<br>
+        Guarda el PDF primero si quieres adjuntarlo en el chat.
+      </p>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="card-title" style="margin:0">🔍 Diagnóstico / falla encontrada</div>
+        <button class="btn ghost small" style="padding:8px 14px;font-size:14.5px" data-act="diag-editar" data-id="${o.id}">✏️ Editar</button>
+      </div>
+      <div class="diag-box ${o.diagnostico?'':'empty'}">${o.diagnostico ? esc(o.diagnostico) : 'Sin diagnóstico registrado. Toca "Editar" para escribirlo.'}</div>
+      ${o.notas ? `<div style="margin-top:12px;font-size:15px;color:var(--muted)"><b>Falla reportada por el cliente:</b><br>${esc(o.notas)}</div>` : ''}
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="card-title" style="margin:0">🛒 Repuestos a adquirir</div>
+        <button class="btn ghost small" style="padding:8px 14px;font-size:14.5px" data-act="pendiente-nuevo" data-id="${o.id}">+ Añadir</button>
+      </div>
+      ${o.pendientes && o.pendientes.length ? o.pendientes.map(p=>`
+        <div class="row" style="cursor:default">
+          <div class="main">
+            <div class="t">${esc(p.nombre)}</div>
+            <div class="s">${p.cantidad} × ${money(p.precio)} · Subtotal ${money(p.cantidad*p.precio)}</div>
+          </div>
+          <button class="icon-btn" data-act="pendiente-borrar" data-id="${p.id}" data-orden="${o.id}">✕</button>
+        </div>`).join('') : '<div class="empty">Aún no hay repuestos pendientes por adquirir</div>'}
+      ${o.pendientes && o.pendientes.length ? `
+        <div class="mini-row" style="margin-top:10px">
+          <span>Total estimado repuestos</span><b>${money(totalPend)}</b>
+        </div>` : ''}
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔧 Servicios y repuestos realizados</div>
+      ${o.items.length ? o.items.map(it=>`
+        <div class="row" style="cursor:default">
+          <div class="main">
+            <div class="t">${esc(it.nombre)}</div>
+            <div class="s">${it.cantidad} × ${money(it.precio)} · ${it.tipo==='repuesto'?'repuesto':'servicio'}</div>
+          </div>
+          <div class="right">${money(it.cantidad*it.precio)}</div>
+          <button class="icon-btn" data-act="item-borrar" data-id="${it.id}" data-orden="${o.id}">✕</button>
+        </div>`).join('') : '<div class="empty">Sin ítems agregados</div>'}
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button class="btn ghost small" style="flex:1" data-act="item-nuevo" data-id="${o.id}" data-tipo="servicio">+ Servicio</button>
+        <button class="btn ghost small" style="flex:1" data-act="item-nuevo" data-id="${o.id}" data-tipo="repuesto">+ Repuesto</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💰 Resumen de pago</div>
+      <div class="mini-row"><span>Total orden</span><b>${money(total)}</b></div>
+      <div class="mini-row"><span>Pagado</span><b style="color:var(--ok)">${money(pagado)}</b></div>
+      <div class="mini-row"><span>Saldo pendiente</span>
+        <b style="color:${saldo>0.5?'var(--danger)':'var(--ok)'}">${money(saldo)}</b></div>
+      <button class="btn primary full" style="margin-top:14px" data-act="abono-nuevo" data-id="${o.id}">+ Registrar abono</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Historial de pagos</div>
+      ${o.pagos.length ? o.pagos.map(p=>`
+        <div class="mini-row">
+          <span>${fechaCorta(p.fecha)} · ${esc(p.metodo||'')}</span>
+          <b>${money(p.monto)}</b>
+        </div>`).join('') : '<div class="empty">Sin pagos registrados</div>'}
+    </div>
+
+    <div style="margin-bottom:22px">
+      <button class="btn danger small full" data-act="orden-borrar" data-id="${o.id}">🗑 Eliminar orden</button>
+    </div>
+  `;
+}
+
+/* ============================================================
+   VISTA: ALMACÉN
+   ============================================================ */
+function viewAlmacen(){
+  const sub = state.subtabAlmacen || 'servicios';
+  return `
+    <div class="segmented">
+      <button class="${sub==='servicios'?'active':''}" data-act="subtab" data-id="servicios">Servicios</button>
+      <button class="${sub==='repuestos'?'active':''}" data-act="subtab" data-id="repuestos">Repuestos</button>
+      <button class="${sub==='movimientos'?'active':''}" data-act="subtab" data-id="movimientos">Movimientos</button>
+    </div>
+    ${sub==='servicios' ? viewServicios() : sub==='repuestos' ? viewRepuestos() : viewMovimientos()}
+  `;
+}
+function viewServicios(){
+  return `
+    <button class="btn primary full" data-act="servicio-nuevo">+ Nuevo servicio</button>
+    <div style="height:14px"></div>
+    ${db.servicios.length ? db.servicios.map(s=>`
+      <div class="row" style="cursor:default">
+        <div class="main"><div class="t">${esc(s.nombre)}</div></div>
+        <div class="right">${money(s.precio)}</div>
+        <button class="icon-btn" data-act="servicio-editar" data-id="${s.id}">✏️</button>
+        <button class="icon-btn" data-act="servicio-borrar" data-id="${s.id}">🗑</button>
+      </div>`).join('') : '<div class="empty">Sin servicios</div>'}
+  `;
+}
+function viewRepuestos(){
+  return `
+    <button class="btn primary full" data-act="repuesto-nuevo">+ Nuevo repuesto</button>
+    <div style="height:14px"></div>
+    ${db.repuestos.length ? db.repuestos.map(r=>{
+      const cls = stockClass(r.stock);
+      return `<div class="row" data-act="repuesto-kardex" data-id="${r.id}">
+        <div class="main">
+          <div class="t">${esc(r.nombre)}<span class="stock-pill ${cls}">${r.stock}</span></div>
+          <div class="s">Compra ${money(r.precioCompra)} · Venta ${money(r.precioVenta)}</div>
+        </div>
+        <button class="icon-btn" data-act="repuesto-entrada" data-id="${r.id}" title="Registrar entrada">📥</button>
+        <button class="icon-btn" data-act="repuesto-salida"  data-id="${r.id}" title="Registrar salida">📤</button>
+      </div>`;
+    }).join('') : '<div class="empty">Sin repuestos</div>'}
+  `;
+}
+function viewMovimientos(){
+  const filtro = state.filtroMov || 'todas';
+  let lista = db.movimientos
+    .filter(m => db.repuestos.some(r=>r.id===m.repuestoId))
+    .sort((a,b)=> String(b.fecha).localeCompare(String(a.fecha)) || String(b.id).localeCompare(String(a.id)));
+  if(filtro === 'entradas') lista = lista.filter(m=>m.tipo==='entrada');
+  if(filtro === 'salidas')  lista = lista.filter(m=>m.tipo==='salida');
+
+  const grupos = {};
+  lista.forEach(m => (grupos[m.fecha] = grupos[m.fecha] || []).push(m));
+  const fechas = Object.keys(grupos).sort((a,b)=>b.localeCompare(a));
+
+  return `
+    <div class="chips">
+      ${['todas','entradas','salidas'].map(x=>
+        `<button class="chip ${filtro===x?'active':''}" data-act="filtro-mov" data-id="${x}">${x[0].toUpperCase()+x.slice(1)}</button>`
+      ).join('')}
+    </div>
+    ${fechas.length ? fechas.map(f=>`
+      <div class="card-title" style="margin-top:14px">${fechaCorta(f)}</div>
+      ${grupos[f].map(movRow).join('')}
+    `).join('') : '<div class="empty">Sin movimientos registrados</div>'}
+  `;
+}
+
+/* ============================================================
+   KARDEX
+   ============================================================ */
+function verKardex(repuestoId){
+  const r = db.repuestos.find(x=>x.id===repuestoId);
+  if(!r) return;
+  const movs = db.movimientos
+    .filter(m=>m.repuestoId===repuestoId)
+    .sort((a,b)=> String(b.fecha).localeCompare(String(a.fecha)) || String(b.id).localeCompare(String(a.id)));
+  const totalIn  = movs.filter(m=>m.tipo==='entrada').reduce((s,m)=>s+m.cantidad,0);
+  const totalOut = movs.filter(m=>m.tipo==='salida').reduce((s,m)=>s+m.cantidad,0);
+
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="overlay" id="kardexOverlay">
+      <div class="sheet">
+        <div class="sheet-head">
+          <h2>${esc(r.nombre)}</h2>
+          <button class="icon-btn" id="kxClose" type="button">✕</button>
+        </div>
+        <div class="sheet-body">
+          <div class="kardex-summary">
+            <div><div class="lbl">Stock</div><div class="val" style="color:${r.stock===0?'var(--danger)':r.stock<=3?'var(--warn)':'var(--ok)'}">${r.stock}</div></div>
+            <div><div class="lbl">Entradas</div><div class="val" style="color:var(--ok)">${totalIn}</div></div>
+            <div><div class="lbl">Salidas</div><div class="val" style="color:var(--danger)">${totalOut}</div></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:10px">
+            <button type="button" class="btn ghost small" style="flex:1" id="kxEntrada">📥 Entrada</button>
+            <button type="button" class="btn ghost small" style="flex:1" id="kxSalida">📤 Salida</button>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:16px">
+            <button type="button" class="btn ghost small" style="flex:1" id="kxEditar">✏️ Editar</button>
+            <button type="button" class="btn danger small" style="flex:1" id="kxBorrar">🗑 Eliminar</button>
+          </div>
+          <div class="card-title">Historial de movimientos (${movs.length})</div>
+          ${movs.length ? movs.map(movRow).join('') : '<div class="empty">Sin movimientos registrados</div>'}
+        </div>
+        <div class="sheet-foot">
+          <button class="btn ghost" id="kxCerrarPie" type="button">Cerrar</button>
+        </div>
+      </div>
+    </div>`;
+
+  const cerrar = ()=> closeModal();
+  document.getElementById('kxClose').onclick = cerrar;
+  document.getElementById('kxCerrarPie').onclick = cerrar;
+  document.getElementById('kardexOverlay').onclick = e => { if(e.target.id==='kardexOverlay') cerrar(); };
+  document.getElementById('kxEntrada').onclick = ()=> formMovimiento(repuestoId,'entrada',true);
+  document.getElementById('kxSalida').onclick  = ()=> formMovimiento(repuestoId,'salida',true);
+  document.getElementById('kxEditar').onclick  = ()=> formRepuesto(repuestoId,true);
+  document.getElementById('kxBorrar').onclick  = ()=>{ borrarRepuesto(repuestoId); closeModal(); };
+}
+
+/* ============================================================
+   FORMULARIOS
+   ============================================================ */
+function formCliente(id){
+  const c = id ? db.clientes.find(x=>x.id===id) : { nombre:'', telefono:'', direccion:'' };
+  openModal(id ? 'Editar cliente' : 'Nuevo cliente',
+    field('Nombre *','nombre',c.nombre,'text','required') +
+    field('Teléfono','telefono',c.telefono,'tel','inputmode="tel"') +
+    field('Dirección','direccion',c.direccion),
+    d=>{
+      const nombre = (d.nombre||'').trim();
+      if(!nombre){ alert('El nombre es obligatorio'); return false; }
+      const obj = { nombre, telefono:(d.telefono||'').trim(), direccion:(d.direccion||'').trim() };
+      if(id) Object.assign(c, obj); else db.clientes.push({ id:uid(), ...obj });
+      save(); render();
+    });
+}
+
+function formVehiculo(id, clienteId){
+  if(!db.clientes.length){ alert('Primero registra un cliente.'); return; }
+  const v = id ? db.vehiculos.find(x=>x.id===id)
+               : { clienteId: clienteId || db.clientes[0].id, marca:'', modelo:'', anio:'', placa:'', km:'' };
+  const opts = db.clientes.map(c=>({ value:c.id, label:c.nombre }));
+  openModal(id ? 'Editar vehículo' : 'Nuevo vehículo',
+    selectField('Cliente','clienteId',opts,v.clienteId) +
+    field('Marca','marca',v.marca) +
+    field('Modelo','modelo',v.modelo) +
+    field('Año','anio',v.anio,'number','min="1900" max="2100"') +
+    field('Placa','placa',v.placa) +
+    field('Kilometraje','km',v.km,'number','min="0"'),
+    d=>{
+      if(!(d.placa||'').trim() && !(d.marca||'').trim()){ alert('Ingresa al menos placa o marca'); return false; }
+      const obj = {
+        clienteId:d.clienteId, marca:(d.marca||'').trim(), modelo:(d.modelo||'').trim(),
+        anio:(d.anio||'').trim(), placa:(d.placa||'').trim().toUpperCase(), km:(d.km||'').trim()
+      };
+      if(id) Object.assign(v,obj); else db.vehiculos.push({ id:uid(), ...obj });
+      save(); render();
+    });
+}
+
+function formServicio(id){
+  const s = id ? db.servicios.find(x=>x.id===id) : { nombre:'', precio:'' };
+  openModal(id ? 'Editar servicio' : 'Nuevo servicio',
+    field('Nombre *','nombre',s.nombre,'text','required') +
+    field('Precio','precio',s.precio,'number','min="0" step="any" inputmode="decimal"'),
+    d=>{
+      const nombre = (d.nombre||'').trim();
+      if(!nombre){ alert('El nombre es obligatorio'); return false; }
+      const obj = { nombre, precio: parseFloat(d.precio)||0 };
+      if(id) Object.assign(s,obj); else db.servicios.push({ id:uid(), ...obj });
+      save(); render();
+    });
+}
+
+function formRepuesto(id, volverAKardex){
+  const r = id ? db.repuestos.find(x=>x.id===id)
+               : { nombre:'', stock:0, precioCompra:0, precioVenta:0 };
+  openModal(id ? 'Editar repuesto' : 'Nuevo repuesto',
+    field('Nombre *','nombre',r.nombre,'text','required') +
+    field('Stock actual (ajustable)','stock',r.stock,'number','min="0" step="1" inputmode="numeric"') +
+    field('Precio de compra','precioCompra',r.precioCompra,'number','min="0" step="any" inputmode="decimal"') +
+    field('Precio de venta','precioVenta',r.precioVenta,'number','min="0" step="any" inputmode="decimal"') +
+    `<p style="margin:-2px 0 12px;font-size:14px;color:var(--muted);line-height:1.45">
+       Si cambias el stock desde aquí, se registrará como <b>ajuste</b> en el kardex.
+     </p>`,
+    d=>{
+      const nombre = (d.nombre||'').trim();
+      if(!nombre){ alert('El nombre es obligatorio'); return false; }
+      const nuevoStock = Math.max(0, parseInt(d.stock)||0);
+      const pc = parseFloat(d.precioCompra)||0;
+      const pv = parseFloat(d.precioVenta)||0;
+      if(id){
+        const diff = nuevoStock - r.stock;
+        if(diff !== 0){
+          if(diff > 0) registrarMovimiento(id, 'entrada', diff, 'ajuste', null, 'Ajuste desde edición');
+          else         registrarMovimiento(id, 'salida', -diff, 'ajuste', null, 'Ajuste desde edición');
+        }
+        r.nombre = nombre; r.precioCompra = pc; r.precioVenta = pv;
+      } else {
+        const newId = uid();
+        db.repuestos.push({ id:newId, nombre, stock:0, precioCompra:pc, precioVenta:pv });
+        if(nuevoStock > 0) registrarMovimiento(newId, 'entrada', nuevoStock, 'inicial', null, 'Stock inicial');
+      }
+      save(); render();
+      if(volverAKardex && id) setTimeout(()=>verKardex(id), 40);
+    });
+}
+
+function formMovimiento(repuestoId, tipo, volverAKardex){
+  const r = db.repuestos.find(x=>x.id===repuestoId);
+  if(!r) return;
+  const motivos = tipo==='entrada' ? MOTIVOS_ENTRADA : MOTIVOS_SALIDA;
+  const defaultMotivo = tipo==='entrada' ? 'compra' : 'venta';
+  openModal(tipo==='entrada' ? 'Entrada de stock' : 'Salida de stock',
+    `<p style="margin:0 0 4px;font-size:17px;font-weight:800">${esc(r.nombre)}</p>
+     <p style="margin:0 0 16px;font-size:15px;color:var(--muted)">Stock actual: <b>${r.stock}</b></p>` +
+    field('Cantidad *','cantidad','1','number','min="1" step="1" inputmode="numeric" required') +
+    selectField('Motivo', 'motivo', motivos, defaultMotivo) +
+    field('Fecha','fecha', hoyISO(),'date','required') +
+    field('Referencia / nota (opcional)','refDesc','','text'),
+    d=>{
+      const cant = parseInt(d.cantidad)||0;
+      if(cant <= 0){ alert('Cantidad inválida'); return false; }
+      if(tipo==='salida' && r.stock < cant){ alert(`Stock insuficiente. Disponible: ${r.stock}`); return false; }
+      registrarMovimiento(repuestoId, tipo, cant, d.motivo, null, (d.refDesc||'').trim(), d.fecha);
+      save(); render();
+      if(volverAKardex) setTimeout(()=>verKardex(repuestoId), 40);
+    },
+    tipo==='entrada' ? 'Registrar entrada' : 'Registrar salida');
+}
+
+function formOrden(vehiculoId){
+  if(!db.vehiculos.length){ alert('Primero registra un cliente y un vehículo.'); return; }
+  const opts = db.vehiculos.map(v=>{
+    const c = db.clientes.find(x=>x.id===v.clienteId);
+    return { value:v.id, label:`${v.placa || v.marca || 'Vehículo'} — ${c?c.nombre:'Sin dueño'}` };
+  });
+  openModal('Nueva orden de trabajo',
+    selectField('Vehículo','vehiculoId',opts,vehiculoId||opts[0].value) +
+    field('Fecha','fecha', hoyISO(),'date','required') +
+    textareaField('Falla reportada por el cliente','notas','',3),
+    d=>{
+      const nums = db.ordenes.map(o=>Number(o.numero)||0);
+      const o = {
+        id:uid(), numero: (Math.max(0, ...nums) + 1),
+        vehiculoId:d.vehiculoId,
+        fecha:d.fecha || hoyISO(),
+        notas:(d.notas||'').trim(),
+        diagnostico:'',
+        pendientes:[],
+        estado:'abierta', items:[], pagos:[]
+      };
+      db.ordenes.push(o); save();
+      go('orden', o.id);
+    }, 'Crear orden');
+}
+
+function formItemOrden(ordenId, tipo){
+  const o = db.ordenes.find(x=>x.id===ordenId);
+  if(!o) return;
+  const cat = tipo==='servicio' ? db.servicios : db.repuestos;
+  if(!cat.length){
+    alert('El catálogo de ' + (tipo==='servicio'?'servicios':'repuestos') + ' está vacío.\nAgrégalo en la pestaña Almacén.');
+    return;
+  }
+  const opts = cat.map(x=>({
+    value:x.id,
+    label:`${x.nombre} — ${money(tipo==='servicio'?x.precio:x.precioVenta)}` + (tipo==='repuesto'?` (stock ${x.stock})`:'')
+  }));
+  const root = openModal(tipo==='servicio' ? 'Agregar servicio' : 'Agregar repuesto',
+    selectField('Ítem','itemId',opts,opts[0].value) +
+    field('Cantidad','cantidad','1','number','min="1" step="1" inputmode="numeric"') +
+    field('Precio unitario','precio', tipo==='servicio'?cat[0].precio:cat[0].precioVenta,'number','min="0" step="any" inputmode="decimal"'),
+    d=>{
+      const it = cat.find(x=>x.id===d.itemId);
+      if(!it) return false;
+      const cant = Math.max(1, parseInt(d.cantidad)||1);
+      const precio = parseFloat(d.precio)||0;
+      if(tipo==='repuesto'){
+        if(it.stock < cant){ alert(`Stock insuficiente. Disponible: ${it.stock}`); return false; }
+        registrarMovimiento(it.id, 'salida', cant, 'servicio', o.id, ordenRef(o));
+      }
+      o.items.push({ id:uid(), tipo, itemId:it.id, nombre:it.nombre, cantidad:cant, precio });
+      save(); render();
+    }, 'Agregar');
+
+  const sel = root.querySelector('[name=itemId]');
+  sel.onchange = () => {
+    const it = cat.find(x=>x.id===sel.value);
+    if(it) root.querySelector('[name=precio]').value = tipo==='servicio' ? it.precio : it.precioVenta;
+  };
+}
+
+function formAbono(ordenId){
+  const o = db.ordenes.find(x=>x.id===ordenId);
+  if(!o) return;
+  const saldo = saldoOrden(o);
+  openModal('Registrar abono',
+    `<p style="margin:0 0 16px;font-size:15px;color:var(--muted)">
+       Saldo pendiente: <b style="color:var(--danger);font-size:17px">${money(saldo)}</b></p>` +
+    field('Monto *','monto', saldo>0 ? Math.round(saldo) : 0, 'number','min="1" step="any" inputmode="decimal" required') +
+    field('Fecha','fecha', hoyISO(),'date','required') +
+    selectField('Método de pago','metodo',[
+      {value:'efectivo',     label:'Efectivo'},
+      {value:'transferencia',label:'Transferencia'},
+      {value:'tarjeta',      label:'Tarjeta'},
+      {value:'nequi',        label:'Nequi / Daviplata'},
+      {value:'otro',         label:'Otro'}
+    ], 'efectivo'),
+    d=>{
+      const monto = parseFloat(d.monto)||0;
+      if(monto <= 0){ alert('El monto debe ser mayor a 0'); return false; }
+      o.pagos.push({ id:uid(), monto, fecha:d.fecha, metodo:d.metodo });
+      save(); render();
+    }, 'Registrar');
+}
+
+function formDiagnostico(ordenId){
+  const o = db.ordenes.find(x=>x.id===ordenId);
+  if(!o) return;
+  openModal('Diagnóstico / falla encontrada',
+    textareaField('Diagnóstico técnico *','diagnostico', o.diagnostico, 6),
+    d=>{
+      o.diagnostico = (d.diagnostico||'').trim();
+      if(o.estado === 'abierta' && o.diagnostico) o.estado = 'proceso';
+      save(); render();
+    });
+}
+
+function formPendiente(ordenId){
+  const o = db.ordenes.find(x=>x.id===ordenId);
+  if(!o) return;
+  const catOpts = ['<option value="">(Escribir manualmente)</option>']
+    .concat(db.repuestos.map(r=>`<option value="${r.id}">${esc(r.nombre)}</option>`)).join('');
+  openModal('Añadir repuesto a adquirir',
+    `<label class="fld"><span>Tomar del catálogo (opcional)</span>
+       <select name="catId" id="pendCat">${catOpts}</select></label>` +
+    field('Nombre del repuesto *','nombre','','text','required') +
+    field('Cantidad','cantidad','1','number','min="1" step="1" inputmode="numeric"') +
+    field('Precio estimado','precio','0','number','min="0" step="any" inputmode="decimal"'),
+    d=>{
+      const nombre = (d.nombre||'').trim();
+      if(!nombre){ alert('El nombre es obligatorio'); return false; }
+      o.pendientes.push({
+        id: uid(), nombre,
+        cantidad: Math.max(1, parseInt(d.cantidad)||1),
+        precio: parseFloat(d.precio)||0
+      });
+      save(); render();
+    }, 'Añadir');
+  setTimeout(()=>{
+    const sel = document.getElementById('pendCat');
+    if(!sel) return;
+    sel.onchange = ()=>{
+      const r = db.repuestos.find(x=>x.id===sel.value);
+      if(r){
+        document.querySelector('[name=nombre]').value = r.nombre;
+        document.querySelector('[name=precio]').value = r.precioVenta;
+      }
+    };
+  }, 40);
+}
+
+/* ============================================================
+   WHATSAPP — envío directo al cliente
+   ============================================================ */
+function normalizarTelefono(tel){
+  let num = String(tel||'').replace(/\D/g, '');
+  if(!num) return '';
+  if(num.startsWith('0')) num = num.substring(1);
+  if(num.length === 10 && !num.startsWith('57')) num = '57' + num;
+  return num;
+}
+
+function generarTextoWhatsApp(ordenId, tipo){
+  const o = db.ordenes.find(x=>x.id===ordenId);
+  if(!o) return '';
+  const v = db.vehiculos.find(x=>x.id===o.vehiculoId);
+  const c = v && db.clientes.find(x=>x.id===v.clienteId);
+  const cfg = db.ajustes || {};
+  const taller = cfg.nombreTaller || 'Mi Taller';
+  const num = numOrden(o.numero);
+  const vehDesc = v ? [v.placa, v.marca, v.modelo, v.anio].filter(Boolean).join(' ') : '';
+
+  let txt = `*${taller}*\n`;
+  if(cfg.telefono) txt += `Tel: ${cfg.telefono}\n`;
+  txt += '\n';
+
+  if(tipo === 'ingreso'){
+    txt += `*COMPROBANTE DE INGRESO*\n`;
+    txt += `Orden: ${num}\n`;
+    txt += `Fecha: ${fechaLarga(o.fecha)}\n\n`;
+    if(c) txt += `*Cliente:* ${c.nombre}\n`;
+    if(vehDesc) txt += `*Vehículo:* ${vehDesc}\n\n`;
+    if(o.notas) txt += `*Falla reportada:*\n${o.notas}\n\n`;
+    txt += `Su vehículo fue recibido para revisión.\n`;
+    txt += `En breve le enviaremos el diagnóstico y presupuesto.`;
+  }
+
+  else if(tipo === 'diagnostico'){
+    const pend = o.pendientes || [];
+    const totalPend = pend.reduce((s,p)=> s + p.cantidad*p.precio, 0);
+    txt += `*INFORME DE DIAGNÓSTICO*\n`;
+    txt += `Orden: ${num}\n`;
+    txt += `Fecha: ${fechaLarga(hoyISO())}\n\n`;
+    if(c) txt += `*Cliente:* ${c.nombre}\n`;
+    if(vehDesc) txt += `*Vehículo:* ${vehDesc}\n\n`;
+    if(o.diagnostico) txt += `*Diagnóstico:*\n${o.diagnostico}\n\n`;
+    if(pend.length){
+      txt += `*Repuestos a adquirir:*\n`;
+      pend.forEach(p=>{
+        txt += `• ${p.nombre} x${p.cantidad} = ${money(p.cantidad*p.precio)}\n`;
+      });
+      txt += `\n*Total estimado:* ${money(totalPend)}\n\n`;
+    } else {
+      txt += `_No se requieren repuestos adicionales._\n\n`;
+    }
+    txt += `¿Autoriza la reparación?`;
+  }
+
+  else if(tipo === 'entrega'){
+    const items = o.items || [];
+    const total = items.reduce((s,i)=> s + i.cantidad*i.precio, 0);
+    const pagado = (o.pagos||[]).reduce((s,p)=> s + Number(p.monto||0), 0);
+    const saldo = total - pagado;
+    txt += `*COMPROBANTE DE ENTREGA*\n`;
+    txt += `Orden: ${num}\n`;
+    txt += `Fecha: ${fechaLarga(hoyISO())}\n\n`;
+    if(c) txt += `*Cliente:* ${c.nombre}\n`;
+    if(vehDesc) txt += `*Vehículo:* ${vehDesc}\n\n`;
+    if(items.length){
+      txt += `*Trabajos realizados:*\n`;
+      items.forEach(it=>{
+        txt += `• ${it.nombre} x${it.cantidad} = ${money(it.cantidad*it.precio)}\n`;
+      });
+      txt += '\n';
+    }
+    txt += `*Total:* ${money(total)}\n`;
+    txt += `*Pagado:* ${money(pagado)}\n`;
+    txt += `*${saldo>0.5?'Saldo pendiente':'Estado'}:* ${saldo>0.5 ? money(saldo) : 'PAGADO'}\n\n`;
+    txt += `Su vehículo está listo para retirar.`;
+  }
+
+  return txt;
+}
+
+function abrirWhatsApp(ordenId, tipo){
+  const o = db.ordenes.find(x=>x.id===ordenId);
+  if(!o) return;
+  const v = db.vehiculos.find(x=>x.id===o.vehiculoId);
+  const c = v && db.clientes.find(x=>x.id===v.clienteId);
+
+  if(!c){
+    alert('El vehículo no tiene un cliente asociado.');
+    return;
+  }
+
+  if(!c.telefono || !normalizarTelefono(c.telefono)){
+    if(confirm(`El cliente "${c.nombre}" no tiene un teléfono válido registrado.\n\n¿Deseas agregarlo ahora?`)){
+      formCliente(c.id);
+    }
+    return;
+  }
+
+  const tel = normalizarTelefono(c.telefono);
+  const texto = generarTextoWhatsApp(ordenId, tipo);
+  const url = `https://wa.me/${tel}?text=${encodeURIComponent(texto)}`;
+  window.open(url, '_blank');
+}
+
+/* ============================================================
+   TICKETS 80mm
+   ============================================================ */
+function tkHeader(cfg){
+  const n = cfg.nombreTaller || 'Mi Taller';
+  const dir = cfg.direccion || '';
+  const tel = cfg.telefono || '';
+  const nit = cfg.nit || '';
+  return `<div class="tk-header tk-center">
+    <div class="tk-name">${esc(n)}</div>
+    ${dir ? `<div class="tk-line">${esc(dir)}</div>` : ''}
+    ${tel ? `<div class="tk-line">Tel: ${esc(tel)}</div>` : ''}
+    ${nit ? `<div class="tk-line">NIT: ${esc(nit)}</div>` : ''}
+  </div>
+  <div class="tk-sep-strong"></div>`;
+}
+function tkCliente(c){
+  return `<div class="tk-section">
+    <div class="tk-label">Cliente</div>
+    <div>${esc(c ? c.nombre : '—')}</div>
+    ${c && c.telefono ? `<div class="tk-sm">Tel: ${esc(c.telefono)}</div>` : ''}
+  </div>`;
+}
+function tkVehiculo(v){
+  if(!v) return '';
+  return `<div class="tk-section">
+    <div class="tk-label">Vehículo</div>
+    <div class="tk-row"><span>Placa:</span><span>${esc(v.placa||'—')}</span></div>
+    <div class="tk-row"><span>Marca:</span><span>${esc(v.marca||'—')}</span></div>
+    <div class="tk-row"><span>Modelo:</span><span>${esc(v.modelo||'—')}</span></div>
+    ${v.anio ? `<div class="tk-row"><span>Año:</span><span>${esc(v.anio)}</span></div>` : ''}
+    ${v.km ? `<div class="tk-row"><span>Kilometraje:</span><span>${esc(v.km)} km</span></div>` : ''}
+  </div>`;
+}
+function tkFirmas(izq, der){
+  return `<div class="tk-sign">
+    <div>
+      <div class="tk-sign-line"></div>
+      <div class="tk-sign-label">${esc(izq)}</div>
+    </div>
+    <div>
+      <div class="tk-sign-line"></div>
+      <div class="tk-sign-label">${esc(der)}</div>
+    </div>
+  </div>`;
+}
+function tkPie(cfg, num){
+  const d = new Date();
+  const fecha = String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+  const hora = horaActual();
+  return `<div class="tk-pie">Generado: ${fecha} ${hora}<br>${esc(cfg.nombreTaller||'Taller')} · Orden ${esc(num)}</div>`;
+}
+
+function generarPDF(ordenId, tipo){
+  const o = db.ordenes.find(x=>x.id===ordenId);
+  if(!o) return;
+  const v = db.vehiculos.find(x=>x.id===o.vehiculoId);
+  const c = v && db.clientes.find(x=>x.id===v.clienteId);
+  const cfg = db.ajustes || {};
+  const num = numOrden(o.numero);
+  const fechaOrd = fechaLarga(o.fecha);
+  let ticket = '';
+
+  /* ---------- COMPROBANTE DE INGRESO ---------- */
+  if(tipo === 'ingreso'){
+    ticket = `<div class="ticket">
+      ${tkHeader(cfg)}
+      <div class="tk-doc-title">COMPROBANTE DE INGRESO</div>
+      <div class="tk-doc-num">Orden ${esc(num)}</div>
+      <div class="tk-doc-fecha">Fecha: ${fechaOrd}</div>
+      <div class="tk-sep"></div>
+      ${tkCliente(c)}
+      <div class="tk-sep"></div>
+      ${tkVehiculo(v)}
+      <div class="tk-sep"></div>
+      <div class="tk-section">
+        <div class="tk-label">Falla reportada</div>
+        <div class="tk-box">${o.notas ? esc(o.notas) : '<span class="tk-empty">Sin descripción</span>'}</div>
+      </div>
+      <div class="tk-aviso">
+        <b>IMPORTANTE:</b> Este comprobante acredita el ingreso del vehículo al taller
+        para revisión y diagnóstico. El cliente será contactado para autorizar el
+        presupuesto antes de iniciar los trabajos.
+      </div>
+      ${tkFirmas('Firma del cliente', 'Por el taller')}
+      ${tkPie(cfg, num)}
+    </div>`;
+  }
+
+  /* ---------- INFORME DE DIAGNÓSTICO ---------- */
+  else if(tipo === 'diagnostico'){
+    const pend = o.pendientes || [];
+    const totalPend = pend.reduce((s,p)=> s + p.cantidad*p.precio, 0);
+    ticket = `<div class="ticket">
+      ${tkHeader(cfg)}
+      <div class="tk-doc-title">INFORME DE DIAGNÓSTICO</div>
+      <div class="tk-doc-num">Orden ${esc(num)}</div>
+      <div class="tk-doc-fecha">Fecha: ${fechaLarga(hoyISO())}</div>
+      <div class="tk-sep"></div>
+      ${tkCliente(c)}
+      <div class="tk-sep"></div>
+      ${tkVehiculo(v)}
+      <div class="tk-sep"></div>
+      <div class="tk-section">
+        <div class="tk-label">Falla reportada</div>
+        <div class="tk-box">${o.notas ? esc(o.notas) : '<span class="tk-empty">No registrada</span>'}</div>
+      </div>
+      <div class="tk-section">
+        <div class="tk-label">Diagnóstico técnico</div>
+        <div class="tk-box">${o.diagnostico ? esc(o.diagnostico) : '<span class="tk-empty">Pendiente</span>'}</div>
+      </div>
+      <div class="tk-sep"></div>
+      <div class="tk-label">Repuestos a adquirir</div>
+      ${pend.length ? pend.map(p=>`
+        <div class="tk-item">
+          <div class="tk-item-title">${esc(p.nombre)}</div>
+          <div class="tk-item-detail">
+            <span>${p.cantidad} × ${money(p.precio)}</span>
+            <span>${money(p.cantidad*p.precio)}</span>
+          </div>
+        </div>`).join('') : '<div class="tk-box tk-empty" style="margin-top:1mm">No se requieren repuestos adicionales.</div>'}
+      ${pend.length ? `
+        <div class="tk-total-section">
+          <div class="tk-total-line big"><span>TOTAL ESTIMADO</span><span>${money(totalPend)}</span></div>
+        </div>` : ''}
+      <div class="tk-aviso">
+        Los valores son una <b>estimación</b> según el diagnóstico preliminar. El
+        precio final puede variar si se encuentran daños adicionales durante la
+        reparación.
+      </div>
+      <div class="tk-section" style="margin-top:3mm">
+        <div class="tk-box" style="min-height:auto;font-size:9.5pt">
+          Autorizo al taller a realizar los trabajos descritos y a adquirir los
+          repuestos listados bajo el presupuesto indicado.
+        </div>
+      </div>
+      ${tkFirmas('Firma del cliente (autorizo)', 'Por el taller')}
+      ${tkPie(cfg, num)}
+    </div>`;
+  }
+
+  /* ---------- COMPROBANTE DE ENTREGA ---------- */
+  else if(tipo === 'entrega'){
+    const items = o.items || [];
+    const pagos = o.pagos || [];
+    const total = items.reduce((s,i)=> s + i.cantidad*i.precio, 0);
+    const pagado = pagos.reduce((s,p)=> s + Number(p.monto||0), 0);
+    const saldo = total - pagado;
+    ticket = `<div class="ticket">
+      ${tkHeader(cfg)}
+      <div class="tk-doc-title">COMPROBANTE DE ENTREGA</div>
+      <div class="tk-doc-num">Orden ${esc(num)}</div>
+      <div class="tk-doc-fecha">Fecha: ${fechaLarga(hoyISO())}</div>
+      <div class="tk-sep"></div>
+      ${tkCliente(c)}
+      <div class="tk-sep"></div>
+      ${tkVehiculo(v)}
+      ${o.diagnostico ? `
+        <div class="tk-sep"></div>
+        <div class="tk-section">
+          <div class="tk-label">Diagnóstico registrado</div>
+          <div class="tk-box">${esc(o.diagnostico)}</div>
+        </div>` : ''}
+      <div class="tk-sep"></div>
+      <div class="tk-label">Trabajos y repuestos realizados</div>
+      ${items.length ? items.map(it=>`
+        <div class="tk-item">
+          <div class="tk-item-title">${esc(it.nombre)}</div>
+          <div class="tk-item-detail">
+            <span>${it.tipo==='repuesto'?'Repuesto':'Servicio'} · ${it.cantidad} × ${money(it.precio)}</span>
+            <span>${money(it.cantidad*it.precio)}</span>
+          </div>
+        </div>`).join('') : '<div class="tk-box tk-empty">Sin trabajos registrados</div>'}
+      <div class="tk-total-section">
+        <div class="tk-total-line"><span>TOTAL</span><span>${money(total)}</span></div>
+        <div class="tk-total-line"><span>Pagado</span><span>${money(pagado)}</span></div>
+        <div class="tk-total-line big"><span>${saldo>0.5?'SALDO':'ESTADO'}</span><span>${saldo>0.5 ? money(saldo) : 'PAGADO'}</span></div>
+      </div>
+      ${pagos.length ? `
+        <div class="tk-sep"></div>
+        <div class="tk-label">Pagos registrados</div>
+        ${pagos.map(p=>`
+          <div class="tk-row" style="font-size:9.5pt">
+            <span>${fechaLarga(p.fecha)} · ${esc(p.metodo||'—')}</span>
+            <span>${money(p.monto)}</span>
+          </div>`).join('')}
+      ` : ''}
+      <div class="tk-aviso">
+        El cliente declara haber recibido el vehículo y los trabajos descritos a
+        entera satisfacción.
+        ${saldo>0.5 ? `<br><br><b>ATENCIÓN:</b> queda un saldo pendiente de ${money(saldo)} que debe cancelarse antes de retirar el vehículo.` : ''}
+      </div>
+      ${tkFirmas('Firma del cliente (recibido)', 'Por el taller (entrega)')}
+      ${tkPie(cfg, num)}
+    </div>`;
+  }
+
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = ticket;
+  document.body.classList.add('printing');
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>{
+      document.body.classList.remove('printing');
+      printArea.innerHTML = '';
+    }, 800);
+  }, 120);
+}
+
+/* ============================================================
+   ACCIONES
+   ============================================================ */
+function restaurarStock(o){
+  (o.items||[]).forEach(it=>{
+    if(it.tipo==='repuesto'){
+      const r = db.repuestos.find(x=>x.id===it.itemId);
+      if(r) registrarMovimiento(it.id, 'entrada', it.cantidad, 'devolucion', o.id, 'Cancelación de orden');
+    }
+  });
+}
+function borrarCliente(id){
+  const vs = db.vehiculos.filter(v=>v.clienteId===id);
+  const vids = vs.map(v=>v.id);
+  const os = db.ordenes.filter(o=>vids.includes(o.vehiculoId));
+  if(!confirm(`¿Eliminar este cliente?\nSe borrarán ${vs.length} vehículo(s) y ${os.length} orden(es).\nLos repuestos volverán al inventario.`)) return;
+  os.forEach(restaurarStock);
+  db.ordenes   = db.ordenes.filter(o=>!vids.includes(o.vehiculoId));
+  db.vehiculos = db.vehiculos.filter(v=>v.clienteId!==id);
+  db.clientes  = db.clientes.filter(c=>c.id!==id);
+  save(); navTab('clientes');
+}
+function borrarItem(ordenId, itemId){
+  const o = db.ordenes.find(x=>x.id===ordenId);
+  if(!o) return;
+  const idx = o.items.findIndex(i=>i.id===itemId);
+  if(idx < 0) return;
+  const it = o.items[idx];
+  if(it.tipo==='repuesto'){
+    const r = db.repuestos.find(x=>x.id===it.itemId);
+    if(r) registrarMovimiento(it.id, 'entrada', it.cantidad, 'devolucion', o.id, 'Devolución de orden');
+  }
+  o.items.splice(idx,1);
+  save(); render();
+}
+function borrarOrden(id){
+  const o = db.ordenes.find(x=>x.id===id);
+  if(!o) return;
+  if(!confirm('¿Eliminar esta orden y todos sus pagos?\nLos repuestos volverán al inventario.')) return;
+  restaurarStock(o);
+  db.ordenes = db.ordenes.filter(x=>x.id!==id);
+  save(); back();
+}
+function cambiarEstado(id, nuevo){
+  const o = db.ordenes.find(x=>x.id===id);
+  if(!o) return;
+  if(nuevo==='cerrada' && saldoOrden(o) > 0.5){
+    if(!confirm(`Esta orden tiene un saldo pendiente de ${money(saldoOrden(o))}.\n¿Cerrarla de todas formas?`)) return;
+  }
+  o.estado = nuevo;
+  save(); render();
+}
+function borrarServicio(id){
+  if(!confirm('¿Eliminar este servicio del catálogo?')) return;
+  db.servicios = db.servicios.filter(x=>x.id!==id);
+  save(); render();
+}
+function borrarRepuesto(id){
+  const r = db.repuestos.find(x=>x.id===id);
+  if(!r) return;
+  const movs = db.movimientos.filter(m=>m.repuestoId===id).length;
+  if(!confirm(`¿Eliminar "${r.nombre}"?\nSe borrarán también ${movs} movimiento(s) de su kardex.`)) return;
+  db.repuestos   = db.repuestos.filter(x=>x.id!==id);
+  db.movimientos = db.movimientos.filter(m=>m.repuestoId!==id);
+  save(); render();
+}
+
+/* ============================================================
+   AJUSTES / RESPALDO
+   ============================================================ */
+function abrirAjustes(){
+  const cfg = db.ajustes || {};
+  openModal('Datos del taller y respaldo',
+    `<div class="card-title" style="margin-top:0">Información para los tickets</div>` +
+    field('Nombre del taller *','nombreTaller', cfg.nombreTaller||'') +
+    field('Dirección','direccion', cfg.direccion||'') +
+    field('Teléfono','telefono', cfg.telefono||'') +
+    field('NIT / RUC','nit', cfg.nit||'') +
+    `<hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+     <p style="font-size:15px;color:var(--muted);margin:0 0 14px;line-height:1.5">
+       Los datos se guardan <b>solo en este dispositivo</b>. Exporta un respaldo periódicamente.
+     </p>
+     <button type="button" class="btn ghost full" style="margin-bottom:12px" id="btnExportar">⬇️ Exportar respaldo (JSON)</button>
+     <button type="button" class="btn ghost full" style="margin-bottom:12px" id="btnImportar">⬆️ Importar respaldo</button>
+     <input type="file" id="fileImport" accept="application/json" style="display:none">
+     <button type="button" class="btn danger full" id="btnReset">🗑️ Borrar todos los datos</button>`,
+    d=>{
+      db.ajustes = {
+        nombreTaller: (d.nombreTaller||'').trim() || 'Mi Taller',
+        direccion: (d.direccion||'').trim(),
+        telefono: (d.telefono||'').trim(),
+        nit: (d.nit||'').trim()
+      };
+      save(); render();
+    }, 'Guardar');
+
+  document.getElementById('btnExportar').onclick = exportar;
+  document.getElementById('btnImportar').onclick = ()=> document.getElementById('fileImport').click();
+  document.getElementById('fileImport').onchange = importar;
+  document.getElementById('btnReset').onclick = ()=>{
+    if(!confirm('¿Borrar TODOS los datos? Esta acción no se puede deshacer.')) return;
+    if(!confirm('Confirma nuevamente: se perderán clientes, vehículos, órdenes, pagos y movimientos.')) return;
+    localStorage.removeItem(DB_KEY);
+    db = { clientes:[], vehiculos:[], servicios:[], repuestos:[], ordenes:[], movimientos:[],
+           ajustes:{ nombreTaller:'Mi Taller', direccion:'', telefono:'', nit:'' } };
+    save(); closeModal(); navTab('inicio');
+  };
+}
+function exportar(){
+  const blob = new Blob([JSON.stringify(db,null,2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'respaldo-taller-' + hoyISO() + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+}
+function importar(e){
+  const f = e.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const d = JSON.parse(r.result);
+      if(!d || !Array.isArray(d.clientes)) throw new Error('Formato no reconocido');
+      if(!confirm('Esto reemplazará los datos actuales. ¿Continuar?')) return;
+      db = Object.assign({clientes:[],vehiculos:[],servicios:[],repuestos:[],ordenes:[],movimientos:[],ajustes:{}}, d);
+      if(!db.movimientos) db.movimientos = [];
+      if(!db.ajustes) db.ajustes = { nombreTaller:'Mi Taller', direccion:'', telefono:'', nit:'' };
+      let siguiente = (Math.max(0, ...db.ordenes.map(o=>Number(o.numero)||0))) + 1;
+      db.ordenes.forEach(o=>{
+        if(!o.numero) o.numero = siguiente++;
+        if(!o.diagnostico) o.diagnostico = '';
+        if(!o.pendientes) o.pendientes = [];
+        if(!o.estado) o.estado = 'abierta';
+      });
+      save(); closeModal(); navTab('inicio');
+      alert('Respaldo importado correctamente.');
+    }catch(err){ alert('Archivo inválido: ' + err.message); }
+  };
+  r.readAsText(f);
+}
+
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+document.addEventListener('click', e=>{
+  const tab = e.target.closest('#tabs button');
+  if(tab){ navTab(tab.dataset.route); return; }
+
+  const el = e.target.closest('[data-act]');
+  if(!el) return;
+
+  const act = el.dataset.act, id = el.dataset.id, tipo = el.dataset.tipo,
+        orden = el.dataset.orden, estado = el.dataset.estado;
+
+  switch(act){
+    case 'back':              back(); break;
+    case 'cliente-nuevo':     formCliente(); break;
+    case 'cliente-editar':    formCliente(id); break;
+    case 'cliente-ver':       go('cliente', id); break;
+    case 'cliente-borrar':    borrarCliente(id); break;
+    case 'vehiculo-nuevo':    formVehiculo(null, id||null); break;
+    case 'vehiculo-editar':   formVehiculo(id); break;
+    case 'vehiculo-ver':      { const v = db.vehiculos.find(x=>x.id===id); if(v) go('cliente', v.clienteId); break; }
+    case 'servicio-nuevo':    formServicio(); break;
+    case 'servicio-editar':   formServicio(id); break;
+    case 'servicio-borrar':   borrarServicio(id); break;
+    case 'repuesto-nuevo':    formRepuesto(); break;
+    case 'repuesto-editar':   formRepuesto(id); break;
+    case 'repuesto-borrar':   borrarRepuesto(id); break;
+    case 'repuesto-kardex':   verKardex(id); break;
+    case 'repuesto-entrada':  formMovimiento(id, 'entrada'); break;
+    case 'repuesto-salida':   formMovimiento(id, 'salida'); break;
+    case 'orden-nuevo':       formOrden(); break;
+    case 'orden-ver':         go('orden', id); break;
+    case 'orden-borrar':      borrarOrden(id); break;
+    case 'estado':            cambiarEstado(id, estado); break;
+    case 'item-nuevo':        formItemOrden(id, tipo); break;
+    case 'item-borrar':       borrarItem(orden, id); break;
+    case 'abono-nuevo':       formAbono(id); break;
+    case 'diag-editar':       formDiagnostico(id); break;
+    case 'pendiente-nuevo':   formPendiente(id); break;
+    case 'pendiente-borrar': {
+      const o = db.ordenes.find(x=>x.id===orden);
+      if(o){ o.pendientes = (o.pendientes||[]).filter(p=>p.id!==id); save(); render(); }
+      break;
+    }
+    case 'pdf':               generarPDF(id, tipo); break;
+    case 'whatsapp':          abrirWhatsApp(id, tipo); break;
+    case 'filtro':            state.filtroOrden = id; render(); break;
+    case 'filtro-mov':        state.filtroMov = id; render(); break;
+    case 'subtab':            state.subtabAlmacen = id; render(); break;
+    case 'ver-movs':          state.subtabAlmacen = 'movimientos'; navTab('almacen'); break;
+  }
+});
+
+document.getElementById('view').addEventListener('input', e=>{
+  if(e.target.id === 'buscarCliente'){
+    state.busquedaCliente = e.target.value;
+    const cont = document.getElementById('listaClientes');
+    if(cont) cont.innerHTML = listaClientesHtml(filtrarClientes());
+  }
+});
+
+document.getElementById('btnAjustes').onclick = abrirAjustes;
+
+/* ============================================================
+   INICIO
+   ============================================================ */
+cargar();
+render();
+</script>
+</body>
+</html>
